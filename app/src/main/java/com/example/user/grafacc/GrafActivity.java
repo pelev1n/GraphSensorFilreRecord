@@ -22,8 +22,10 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -64,6 +66,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         stopRecord = (Button) findViewById(R.id.stop_record);
         showRecord = (Button) findViewById(R.id.show_record);
         recordResult = (TextView) findViewById(R.id.record_result);
+        deleteFile();
 
         startRecord.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -226,6 +229,25 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         super.onDestroy();
     }
 
+    public void deleteFile() {
+        FileOutputStream fos = null;
+        try {
+            fos = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            fos.write("".getBytes());
+            Toast.makeText(this, "Файл Обнулен и готов для записи", Toast.LENGTH_SHORT).show();
+        } catch (IOException ex) {
+
+            Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+        } finally {
+            try {
+                if (fos != null)
+                    fos.close();
+            } catch (IOException ex) {
+
+                Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
     public void saveText(SensorEvent event) {
 
         FileOutputStream fos = null;
