@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">GrafAcc</string>
+    <string name="title_activity_graf">GrafActivity</string>
+</resources>
