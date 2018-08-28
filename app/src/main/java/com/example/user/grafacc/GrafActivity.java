@@ -12,6 +12,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -31,11 +33,23 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
     private Thread thread;
     private boolean plotData = true;
 
+    Button startRecord;
+    Button stopRecord;
+    Button showRecord;
+    TextView recordResult;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graf);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        startRecord = (Button) findViewById(R.id.start_record);
+        stopRecord = (Button) findViewById(R.id.stop_record);
+        showRecord = (Button) findViewById(R.id.show_record);
+        recordResult = (TextView) findViewById(R.id.record_result);
+
         setSupportActionBar(toolbar);
 
         Bundle extras=getIntent().getExtras();
@@ -43,6 +57,8 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         {
           System.out.println(extras.getInt("sensortype"));
         }
+
+
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor=mSensorManager.getDefaultSensor(extras.getInt("sensortype"));
         System.out.println(sensor);
