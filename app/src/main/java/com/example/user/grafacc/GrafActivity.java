@@ -356,6 +356,8 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_WRITE);
             return false;
+        } else {
+            permissionGranted = true;
         }
         return true;
     }
