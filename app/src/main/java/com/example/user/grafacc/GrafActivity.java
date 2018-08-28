@@ -1,14 +1,20 @@
 package com.example.user.grafacc;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -21,6 +27,7 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class GrafActivity extends AppCompatActivity implements SensorEventListener {
+
     private SensorManager mSensorManager;
     Sensor sensor;
     GraphView graph;
@@ -50,10 +58,12 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
     TextView recordResult;
 
     private boolean state;
-    private int timer=0;
+    private int timer = 0;
     private static final DateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
     private final static String FILE_NAME = "filename.txt";
+    private static final int REQUEST_PERMISSION_WRITE = 1001;
+    private boolean permissionGranted;
 
 
     @Override
@@ -66,7 +76,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         stopRecord = (Button) findViewById(R.id.stop_record);
         showRecord = (Button) findViewById(R.id.show_record);
         recordResult = (TextView) findViewById(R.id.record_result);
-        deleteFile();
+        /*deleteFile();*/
 
         startRecord.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,7 +151,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
 
         if (state) {
             timer++;
-            if(timer % 5 == 0) {
+            if (timer % 5 == 0) {
                 System.out.println(timer);
                 saveText(event);
             }
@@ -242,16 +252,29 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
             try {
                 if (fos != null)
                     fos.close();
+                checkPermissions();
+
             } catch (IOException ex) {
 
                 Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
+
+    private File getExternalPath() {
+        return (new File(Environment.getExternalStorageDirectory(), FILE_NAME));
+    }
+
+    // сохранение файла
     public void saveText(SensorEvent event) {
 
+        if (!permissionGranted) {
+            checkPermissions();
+            return;
+        }
         FileOutputStream fos = null;
         try {
+
             float x = event.values[0];
             float y = event.values[1];
             float z = event.values[2];
@@ -261,7 +284,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
                     "y: " + Float.toString(y) +
                     "z: " + Float.toString(z) + "\n";
 
-            fos = openFileOutput(FILE_NAME, MODE_APPEND);
+            fos = new FileOutputStream(getExternalPath());
             fos.write(text.getBytes());
             Toast.makeText(this, "Файл сохранен", Toast.LENGTH_SHORT).show();
         } catch (IOException ex) {
@@ -280,10 +303,17 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
 
     // открытие файла
     public void openText() {
+        if (!permissionGranted) {
+            checkPermissions();
+            return;
+        }
 
         FileInputStream fin = null;
+        File file = getExternalPath();
+        // если файл не существует, выход из метода
+        if (!file.exists()) return;
         try {
-            fin = openFileInput(FILE_NAME);
+            fin = new FileInputStream(file);
             byte[] bytes = new byte[fin.available()];
             fin.read(bytes);
             String text = new String(bytes);
@@ -300,6 +330,47 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
 
                 Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    // проверяем, доступно ли внешнее хранилище для чтения и записи
+    public boolean isExternalStorageWriteable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
+    }
+
+    // проверяем, доступно ли внешнее хранилище хотя бы только для чтения
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        return (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state));
+    }
+
+    private boolean checkPermissions() {
+
+        if (!isExternalStorageReadable() || !isExternalStorageWriteable()) {
+            Toast.makeText(this, "Внешнее хранилище не доступно", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_WRITE);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PERMISSION_WRITE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    permissionGranted = true;
+                    Toast.makeText(this, "Разрешения получены", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "Необходимо дать разрешения", Toast.LENGTH_LONG).show();
+                }
+                break;
         }
     }
 
