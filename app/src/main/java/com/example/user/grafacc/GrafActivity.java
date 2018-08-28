@@ -24,6 +24,9 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class GrafActivity extends AppCompatActivity implements SensorEventListener {
     private SensorManager mSensorManager;
@@ -45,9 +48,9 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
     TextView recordResult;
 
     private boolean state;
+    private static final DateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
     private final static String FILE_NAME = "filename.txt";
-
 
 
     @Override
@@ -61,32 +64,51 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         showRecord = (Button) findViewById(R.id.show_record);
         recordResult = (TextView) findViewById(R.id.record_result);
 
+        startRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                state = true;
+            }
+        });
+
+        stopRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                state = false;
+            }
+        });
+
+        showRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openText();
+            }
+        });
         setSupportActionBar(toolbar);
 
-        Bundle extras=getIntent().getExtras();
-        if(extras!=null)
-        {
-          System.out.println(extras.getInt("sensortype"));
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            System.out.println(extras.getInt("sensortype"));
         }
 
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sensor=mSensorManager.getDefaultSensor(extras.getInt("sensortype"));
+        sensor = mSensorManager.getDefaultSensor(extras.getInt("sensortype"));
         System.out.println(sensor);
-        graph=(GraphView)findViewById(R.id.graph);
-        series = new LineGraphSeries<DataPoint>(new DataPoint[] {
+        graph = (GraphView) findViewById(R.id.graph);
+        series = new LineGraphSeries<DataPoint>(new DataPoint[]{
                 new DataPoint(0, 0),
         });
         series.setColor(Color.GREEN);
 
-        seriesX=new LineGraphSeries<DataPoint>(new DataPoint[]{
+        seriesX = new LineGraphSeries<DataPoint>(new DataPoint[]{
                 new DataPoint(0, 0),
 
         });
         seriesX.setColor(Color.BLACK);
 
-        seriesZ=new LineGraphSeries<DataPoint>(new DataPoint[]{
-                new DataPoint(0,0),
+        seriesZ = new LineGraphSeries<DataPoint>(new DataPoint[]{
+                new DataPoint(0, 0),
         });
         seriesZ.setColor(Color.RED);
 
@@ -100,6 +122,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         feedMultiple();
 
     }
+
     public void addEntry(SensorEvent event) {
         /*     LineGraphSeries<DataPoint> series = new LineGraphSeries<>();*/
         float[] values = event.values;
@@ -124,13 +147,14 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         graph.addSeries(seriesZ);
 
     }
+
     private void addDataPoint(double acceleration) {
         dataPoints[499] = acceleration;
     }
 
     private void feedMultiple() {
 
-        if (thread != null){
+        if (thread != null) {
             thread.interrupt();
         }
 
@@ -138,7 +162,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
 
             @Override
             public void run() {
-                while (true){
+                while (true) {
                     plotData = true;
                     try {
                         Thread.sleep(10);
@@ -152,6 +176,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
 
         thread.start();
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -166,7 +191,10 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(plotData){
+        if (plotData) {
+            if (state) {
+                saveText(event);
+            }
             addEntry(event);
 
             plotData = false;
@@ -177,6 +205,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -190,12 +219,18 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         super.onDestroy();
     }
 
-    public void saveText(View view) {
+    public void saveText(SensorEvent event) {
 
         FileOutputStream fos = null;
         try {
-            EditText textBox = (EditText) findViewById(R.id.save_text);
-            String text = textBox.getText().toString();
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+            Date date = new Date();
+            String printTime = sdf.format(date);
+            String text = printTime + "x: " + Float.toString(x) +
+                    "y: " + Float.toString(y) +
+                    "z: " + Float.toString(z);
 
             fos = openFileOutput(FILE_NAME, MODE_APPEND);
             fos.write(text.getBytes());
@@ -215,16 +250,15 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
     }
 
     // открытие файла
-    public void openText(View view) {
+    public void openText() {
 
         FileInputStream fin = null;
-        TextView textView = (TextView) findViewById(R.id.open_text);
         try {
             fin = openFileInput(FILE_NAME);
             byte[] bytes = new byte[fin.available()];
             fin.read(bytes);
             String text = new String(bytes);
-            textView.setText(text);
+            recordResult.setText(text);
         } catch (IOException ex) {
 
             Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -239,8 +273,6 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
             }
         }
     }
-
-
 
 
 }
