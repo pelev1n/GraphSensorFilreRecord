@@ -136,6 +136,14 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         float z = values[2];
         System.out.println(z);
 
+        if (state) {
+            timer++;
+            if(timer % 5 == 0) {
+                System.out.println(timer);
+                saveText(event);
+            }
+        }
+
 
         graph2LastXValue += 1d;
         graph2LastYValue += 1d;
@@ -194,13 +202,6 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (plotData) {
-            if (state) {
-                timer++;
-                if(timer % 5 == 0) {
-                    System.out.println(timer);
-                    saveText(event);
-                }
-            }
             addEntry(event);
 
             plotData = false;
