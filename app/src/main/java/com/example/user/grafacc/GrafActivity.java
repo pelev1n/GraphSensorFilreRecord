@@ -48,6 +48,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
     TextView recordResult;
 
     private boolean state;
+    private int timer=0;
     private static final DateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
     private final static String FILE_NAME = "filename.txt";
@@ -81,6 +82,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         showRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                state = false;
                 openText();
             }
         });
@@ -193,7 +195,11 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent event) {
         if (plotData) {
             if (state) {
-                saveText(event);
+                timer++;
+                if(timer % 5 == 0) {
+                    System.out.println(timer);
+                    saveText(event);
+                }
             }
             addEntry(event);
 
@@ -230,7 +236,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
             String printTime = sdf.format(date);
             String text = printTime + "x: " + Float.toString(x) +
                     "y: " + Float.toString(y) +
-                    "z: " + Float.toString(z);
+                    "z: " + Float.toString(z) + "\n";
 
             fos = openFileOutput(FILE_NAME, MODE_APPEND);
             fos.write(text.getBytes());
