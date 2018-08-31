@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:tag="cards main container">
 
-    <android.support.v7.widget.CardView
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card_view"
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         card_view:cardBackgroundColor="@color/colorBase"
         card_view:cardCornerRadius="10dp"
         card_view:cardElevation="5dp"
@@ -19,54 +20,40 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/imageView"
-                android:tag="image_tag"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_height="75dp"
+                android:layout_marginTop="35dp"
                 android:layout_weight="1"
-                android:src="@drawable/ic_graph"/>
+                android:src="@drawable/ic_graph"
+                android:tag="image_tag" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:layout_weight="2"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="5dp"
                     android:text="Android Name"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/type"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="10dp"
-
                     android:text="Android Version"
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-                <TextView
-                    android:id="@+id/vendor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="3"
-                    android:paddingRight="16dp"
-                    android:text="vendor"
-                    android:textColor="#555" />
-
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
                     android:id="@+id/version"
@@ -75,6 +62,18 @@
                     android:maxLines="3"
                     android:paddingRight="16dp"
                     android:text="version"
+                    android:textColor="#555" />
+
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/vendor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:paddingRight="16dp"
+                    android:text="vendor"
                     android:textColor="#555" />
 
                 <TextView
@@ -95,12 +94,11 @@
                     android:text="resolution"
                     android:textColor="#555" />
 
-
             </LinearLayout>
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
 
-</LinearLayout>
+</RelativeLayout>
 
 
