@@ -76,7 +76,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         stopRecord = (Button) findViewById(R.id.stop_record);
         showRecord = (Button) findViewById(R.id.show_record);
         recordResult = (TextView) findViewById(R.id.record_result);
-        /*deleteFile();*/
+        deleteFile();
 
         startRecord.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -240,11 +240,16 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void deleteFile() {
+        if (!permissionGranted) {
+            checkPermissions();
+            return;
+        }
         FileOutputStream fos = null;
         try {
-            fos = openFileOutput(FILE_NAME, MODE_PRIVATE);
-            fos.write("".getBytes());
-            Toast.makeText(this, "Файл Обнулен и готов для записи", Toast.LENGTH_SHORT).show();
+            String text = "";
+            fos = new FileOutputStream(getExternalPath(),false);
+            fos.write(text.getBytes());
+            Toast.makeText(this, "Файл сохранен", Toast.LENGTH_SHORT).show();
         } catch (IOException ex) {
 
             Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -252,8 +257,6 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
             try {
                 if (fos != null)
                     fos.close();
-                checkPermissions();
-
             } catch (IOException ex) {
 
                 Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -284,7 +287,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
                     "y: " + Float.toString(y) +
                     "z: " + Float.toString(z) + "\n";
 
-            fos = new FileOutputStream(getExternalPath());
+            fos = new FileOutputStream(getExternalPath(),true);
             fos.write(text.getBytes());
             Toast.makeText(this, "Файл сохранен", Toast.LENGTH_SHORT).show();
         } catch (IOException ex) {
@@ -359,6 +362,7 @@ public class GrafActivity extends AppCompatActivity implements SensorEventListen
         } else {
             permissionGranted = true;
         }
+        permissionGranted = true;
         return true;
     }
 

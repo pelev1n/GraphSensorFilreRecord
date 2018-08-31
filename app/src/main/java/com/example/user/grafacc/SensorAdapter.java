@@ -3,8 +3,6 @@ package com.example.user.grafacc;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
-import android.os.Build;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,14 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder> {
     private List<Sensor> sensors;
     private LayoutInflater mIflater;
     private Context mContext;
+
     public SensorAdapter(Context context, List<Sensor> sensorList) {
     this.mContext=context;
     this.sensors=sensorList;
@@ -31,19 +28,27 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
       View view=mIflater.inflate(R.layout.adapter_item,viewGroup,false);
 
-
+        view.setOnClickListener((View.OnClickListener) mContext);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
     final Sensor sensor=sensors.get(i);
-    viewHolder.name.setText(sensor.getName());
-//        viewHolder.type.setText(sensor.getType());
-//        viewHolder.vendor.setText(sensor.getVendor());
-//        viewHolder.version.setText(sensor.getVersion());
-//        viewHolder.max.setText((int) sensor.getMaximumRange());
-        viewHolder.name.setOnClickListener(new View.OnClickListener() {
+    String[] finalSensorName = sensors.get(i).getName().toString().split(" ");
+    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!" + sensor);
+    System.out.println(Integer.toString(sensor.getType()));
+    System.out.println(sensor.getVendor());
+    System.out.println(sensor.getVersion());
+    System.out.println((int) sensor.getMaximumRange());
+
+    viewHolder.name.setText(finalSensorName[2]);
+        viewHolder.type.setText("Type: " + Integer.toString(sensor.getType()));
+        viewHolder.vendor.setText(sensor.getVendor());
+        viewHolder.version.setText("Version: " + Integer.toString(sensor.getVersion()));
+        viewHolder.max.setText("Max Range: " + Float.toString( sensor.getMaximumRange()));
+        viewHolder.resolution.setText("Resolution: " + Float.toString((sensor.getResolution())));
+        /*viewHolder.name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(mContext, GrafActivity.class);
@@ -53,7 +58,7 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
 
                 mContext.startActivity(intent);
             }
-        });
+        });*/
 
 
     }
