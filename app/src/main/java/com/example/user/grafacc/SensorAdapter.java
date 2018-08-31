@@ -36,11 +36,6 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
     final Sensor sensor=sensors.get(i);
     String[] finalSensorName = sensors.get(i).getName().toString().split(" ");
-    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!" + sensor);
-    System.out.println(Integer.toString(sensor.getType()));
-    System.out.println(sensor.getVendor());
-    System.out.println(sensor.getVersion());
-    System.out.println((int) sensor.getMaximumRange());
 
     viewHolder.name.setText(finalSensorName[2]);
         viewHolder.type.setText("Type: " + Integer.toString(sensor.getType()));
@@ -48,19 +43,6 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
         viewHolder.version.setText("Version: " + Integer.toString(sensor.getVersion()));
         viewHolder.max.setText("Max Range: " + Float.toString( sensor.getMaximumRange()));
         viewHolder.resolution.setText("Resolution: " + Float.toString((sensor.getResolution())));
-        /*viewHolder.name.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(mContext, GrafActivity.class);
-              Integer i=sensor.getType();
-//              String s=sensor.getStringType();
-                    intent.putExtra("sensortype",sensor.getType());
-
-                mContext.startActivity(intent);
-            }
-        });*/
-
-
     }
 
     @Override
