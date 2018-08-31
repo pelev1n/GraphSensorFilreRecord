@@ -16,6 +16,7 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
     private List<Sensor> sensors;
     private LayoutInflater mIflater;
     private Context mContext;
+
     public SensorAdapter(Context context, List<Sensor> sensorList) {
     this.mContext=context;
     this.sensors=sensorList;
